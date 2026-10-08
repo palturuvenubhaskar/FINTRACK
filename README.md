@@ -11,7 +11,7 @@ FINTRACK is a Progressive Web Application (PWA) designed for individual money le
 - **Automated EMIs**: Tracks individual installments, dues, and overdue statuses.
 - **Offline-First**: Built with Dexie.js (IndexedDB) for seamless use in low-connectivity areas.
 - **Cloud Sync**: Firebase integration ensures data is synchronized across devices when online.
-- **Premium Fintech UI**: A stunning light-mode-first aesthetic with a signature lime-green accent, glassmorphic elements, and Golden Ratio layouts.
+- **Premium Fintech UI**: A stunning light and dark mode aesthetic with a signature lime-green accent, glassmorphic elements, and Golden Ratio layouts.
 - **Installable PWA**: Can be installed on mobile or desktop devices natively.
 - **PDF Reports**: Export customer and loan summaries instantly.
 

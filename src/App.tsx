@@ -13,6 +13,7 @@ import NotFound from './components/NotFound'
 import AppLoader from './components/AppLoader'
 import InstallPrompt from './components/InstallPrompt'
 import NetworkIndicators from './components/NetworkIndicators'
+import { ThemeToggle } from './components/ui/theme-toggle'
 
 import SyncIndicator from './components/SyncIndicator'
 import { auth, googleProvider, dbFirestore } from './firebase'
@@ -42,6 +43,25 @@ const navItems: { id: Page; label: string; icon: ReactNode }[] = [
 function App() {
   const [firebaseUser, setFirebaseUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ft_theme');
+      if (saved) return saved === 'dark';
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+      localStorage.setItem('ft_theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      localStorage.setItem('ft_theme', 'light');
+    }
+  }, [isDark]);
 
   useEffect(() => {
     getRedirectResult(auth).catch(console.error);
@@ -272,7 +292,8 @@ function App() {
                 </button>
               ))}
             </nav>
-            <div className="sidebar-footer">
+            <div className="sidebar-footer" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+              <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />
               <SyncIndicator />
             </div>
           </aside>
@@ -284,6 +305,7 @@ function App() {
                 <h1 style={{ fontSize: 'var(--font-lg)', fontWeight: 800, textTransform: 'uppercase', color: 'var(--primary-deep)', margin: 0, lineHeight: 1, letterSpacing: '1px' }}>FINTRACK</h1>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />
                 <div style={{ width: '130px' }}>
                   <SyncIndicator />
                 </div>

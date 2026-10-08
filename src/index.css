@@ -199,3 +199,4 @@ input[type="number"] {
 .h-full { height: 100%; }
 .w-full { width: 100%; }
 .opacity-0 { opacity: 0; }
+html.dark { --bg-color: #0F1115; --bg-card: #17181C; --bg-soft: #1E2024; --bg-input: #1A1C20; --border: #2A2D33; --border-focus: #A3E635; --sidebar-bg: #17181C; --text-primary: #FFFFFF; --text-secondary: #9AA0A6; --text-tertiary: #5F6368; --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.4); --shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.6); --shadow-shell: 0 12px 64px rgba(0, 0, 0, 0.8); --nav-hover-bg: #2A2D33; }
