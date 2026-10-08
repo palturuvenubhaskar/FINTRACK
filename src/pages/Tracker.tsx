@@ -392,6 +392,7 @@ export default function Tracker() {
                   <div style={{ fontSize: '10px', color: 'var(--text-tertiary)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 'var(--space-3)', letterSpacing: '0.5px' }}>Collection Schedule</div>
                   
                   <div className="slots-track" style={{ 
+                    position: 'relative',
                     display: 'flex', flexWrap: 'nowrap', gap: 'var(--space-2)', 
                     overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch',
                     paddingBottom: 'var(--space-2)', paddingTop: '12px'
