@@ -23,6 +23,7 @@ export default function Tracker() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   useEffect(() => {
+    if (isLoading) return;
     // Auto-scroll the horizontal slots to the current active slot
     const timer = setTimeout(() => {
       document.querySelectorAll('.slots-track').forEach(container => {
@@ -36,7 +37,7 @@ export default function Tracker() {
       });
     }, 100);
     return () => clearTimeout(timer);
-  }, [loans, tab, search, sortType]);
+  }, [loans, tab, search, sortType, isLoading]);
 
   useEffect(() => { localStorage.setItem('ft_sort_tracker', sortType); }, [sortType]);
 
