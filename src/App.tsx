@@ -292,9 +292,9 @@ function App() {
                 </button>
               ))}
             </nav>
-            <div className="sidebar-footer" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-              <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />
+            <div className="sidebar-footer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)' }}>
               <SyncIndicator />
+              <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />
             </div>
           </aside>
 
@@ -304,9 +304,9 @@ function App() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                 <h1 style={{ fontSize: 'var(--font-lg)', fontWeight: 800, textTransform: 'uppercase', color: 'var(--primary-deep)', margin: 0, lineHeight: 1, letterSpacing: '1px' }}>FINTRACK</h1>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                 <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />
-                <div style={{ width: '130px' }}>
+                <div style={{ width: 'auto' }}>
                   <SyncIndicator />
                 </div>
               </div>

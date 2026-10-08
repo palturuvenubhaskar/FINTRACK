@@ -8,65 +8,36 @@ interface ThemeToggleProps {
 
 export function ThemeToggle({ className, isDark, onToggle }: ThemeToggleProps) {
   return (
-    <div
+    <button
       className={className}
+      onClick={onToggle}
       style={{
         display: 'flex',
-        width: '64px',
-        height: '32px',
-        padding: '4px',
-        borderRadius: '9999px',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '36px',
+        height: '36px',
+        borderRadius: '50%',
+        background: 'var(--bg-soft)',
+        border: '1px solid var(--border)',
+        color: 'var(--text-secondary)',
         cursor: 'pointer',
-        transition: 'all 300ms',
-        background: isDark ? 'transparent' : '#ffffff',
-        border: `1px solid ${isDark ? 'var(--border)' : '#e4e4e7'}`,
+        transition: 'all 0.2s ease',
+        flexShrink: 0,
+        outline: 'none'
       }}
-      onClick={onToggle}
-      role="button"
-      tabIndex={0}
+      onMouseOver={(e) => {
+        e.currentTarget.style.background = 'var(--border)';
+        e.currentTarget.style.color = 'var(--text-primary)';
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.background = 'var(--bg-soft)';
+        e.currentTarget.style.color = 'var(--text-secondary)';
+      }}
+      aria-label="Toggle theme"
+      title="Toggle Dark Mode"
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '24px',
-            height: '24px',
-            borderRadius: '9999px',
-            transition: 'transform 300ms, background-color 300ms',
-            transform: isDark ? 'translateX(0)' : 'translateX(30px)',
-            background: isDark ? 'rgba(255, 255, 255, 0.15)' : '#e5e7eb',
-            zIndex: 10
-          }}
-        >
-          {isDark ? (
-            <Moon size={16} color="#ffffff" strokeWidth={1.5} />
-          ) : (
-            <Sun size={16} color="#374151" strokeWidth={1.5} />
-          )}
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '24px',
-            height: '24px',
-            borderRadius: '9999px',
-            transition: 'transform 300ms, background-color 300ms',
-            background: 'transparent',
-            transform: isDark ? 'translateX(0)' : 'translateX(-30px)',
-            zIndex: 5
-          }}
-        >
-          {isDark ? (
-            <Sun size={16} color="#71717a" strokeWidth={1.5} />
-          ) : (
-            <Moon size={16} color="#000000" strokeWidth={1.5} />
-          )}
-        </div>
-      </div>
-    </div>
+      {isDark ? <Sun size={18} strokeWidth={2} /> : <Moon size={18} strokeWidth={2} />}
+    </button>
   )
 }
