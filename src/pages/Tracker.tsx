@@ -24,14 +24,29 @@ export default function Tracker() {
   
   useEffect(() => {
     if (isLoading) return;
-    // Auto-scroll the horizontal slots to the current active slot
+    // Auto-scroll the horizontal slots to the date closest to today
     const timer = setTimeout(() => {
+      const now = Date.now();
       document.querySelectorAll('.slots-track').forEach(container => {
-        let target = container.querySelector('.slot-wrapper[data-status="pending"], .slot-wrapper[data-status="missed"], .slot-wrapper[data-status="partial"]');
-        if (!target) target = container.lastElementChild;
-        if (target && container instanceof HTMLElement && target instanceof HTMLElement) {
+        let closestSlot: Element | null = null;
+        let minDiff = Infinity;
+        
+        container.querySelectorAll('.slot-wrapper').forEach(slot => {
+          const dateStr = slot.getAttribute('data-date');
+          if (dateStr) {
+            const date = parseInt(dateStr, 10);
+            const diff = Math.abs(date - now);
+            if (diff < minDiff) {
+              minDiff = diff;
+              closestSlot = slot;
+            }
+          }
+        });
+
+        if (!closestSlot) closestSlot = container.lastElementChild;
+        if (closestSlot && container instanceof HTMLElement && closestSlot instanceof HTMLElement) {
            const containerCenter = container.clientWidth / 2;
-           const targetCenter = target.offsetLeft + (target.clientWidth / 2);
+           const targetCenter = closestSlot.offsetLeft + (closestSlot.clientWidth / 2);
            container.scrollTo({ left: targetCenter - containerCenter, behavior: 'smooth' });
         }
       });
@@ -419,7 +434,7 @@ export default function Tracker() {
                       }
 
                       return (
-                        <div key={emi.id} className="slot-wrapper" data-status={emi.status} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                        <div key={emi.id} className="slot-wrapper" data-status={emi.status} data-date={emi.dueDate} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                           
                           {/* The Slot Box */}
                           <div 
