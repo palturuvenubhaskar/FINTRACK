@@ -228,6 +228,12 @@ function App() {
     return () => document.removeEventListener('ft-navigate', handleNav);
   }, []);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const main = document.querySelector('.main-content');
+    if (main) main.scrollTo(0, 0);
+  }, [page]);
+
   if (authLoading) return <AppLoader />;
 
   if (!firebaseUser) {
