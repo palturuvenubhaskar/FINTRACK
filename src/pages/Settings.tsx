@@ -8,7 +8,7 @@ import PinScreen from '../components/PinScreen';
 import { 
   Laptop, Smartphone, Download, Upload, Trash2, 
   CloudLightning, Shield, Clock, Mail, 
-  ChevronRight, LogOut, Check, FileText, Github, Instagram
+  ChevronRight, LogOut, Check, FileText, Code, AtSign
 } from 'lucide-react';
 
 type ActivityItem = {
@@ -768,7 +768,7 @@ export default function Settings() {
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <a href="https://github.com/palturuvenubhaskar" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 600, fontSize: '15px' }}>
-                    <Github size={20} />
+                    <Code size={20} />
                     <span>palturuvenubhaskar</span>
                   </a>
                   <a href="mailto:palturuvenubhaskar@gmail.com" style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 600, fontSize: '15px' }}>
@@ -776,7 +776,7 @@ export default function Settings() {
                     <span>palturuvenubhaskar@gmail.com</span>
                   </a>
                   <a href="https://instagram.com/vb_nobody" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 600, fontSize: '15px' }}>
-                    <Instagram size={20} />
+                    <AtSign size={20} />
                     <span>@vb_nobody</span>
                   </a>
                 </div>
