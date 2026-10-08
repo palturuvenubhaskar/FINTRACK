@@ -8,7 +8,7 @@ import PinScreen from '../components/PinScreen';
 import { 
   Laptop, Smartphone, Download, Upload, Trash2, 
   CloudLightning, Shield, Clock, Mail, 
-  ChevronRight, LogOut, Check, FileText
+  ChevronRight, LogOut, Check, FileText, Github, Instagram
 } from 'lucide-react';
 
 type ActivityItem = {
@@ -758,17 +758,38 @@ export default function Settings() {
               </div>
             </div>
 
-            <div className="settings-row">
-              <div className="settings-icon" style={{ background: 'var(--bg-soft)', color: 'var(--text-secondary)' }}>
-                <div style={{ fontWeight: 800, fontSize: '20px', fontFamily: 'var(--font-display)' }}>VB</div>
+            <div className="settings-row" style={{ flexDirection: 'column', alignItems: 'stretch', padding: '24px', position: 'relative', overflow: 'hidden', background: 'var(--bg-soft)' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.05, pointerEvents: 'none', background: 'radial-gradient(circle at 50% 50%, var(--primary) 0%, transparent 70%)' }}></div>
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '16px' }}>CREDITS</div>
+                <div style={{ height: '1px', background: 'var(--border)', marginBottom: '24px', opacity: 0.5 }}></div>
+                
+                <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--primary)', marginBottom: '20px' }}>P.VENUBHASKAR</div>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <a href="https://github.com/palturuvenubhaskar" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 600, fontSize: '15px' }}>
+                    <Github size={20} />
+                    <span>palturuvenubhaskar</span>
+                  </a>
+                  <a href="mailto:palturuvenubhaskar@gmail.com" style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 600, fontSize: '15px' }}>
+                    <Mail size={20} />
+                    <span>palturuvenubhaskar@gmail.com</span>
+                  </a>
+                  <a href="https://instagram.com/vb_nobody" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 600, fontSize: '15px' }}>
+                    <Instagram size={20} />
+                    <span>@vb_nobody</span>
+                  </a>
+                </div>
               </div>
-              <div className="settings-content">
-                <div className="settings-title" style={{ color: 'var(--primary)' }}>P.VENUBHASKAR</div>
-                <div className="settings-desc">Built with 💚 for micro-finance</div>
-              </div>
-              <div className="settings-action" style={{ gap: '4px' }}>
-                <a href="mailto:palturuvenubhaskar@gmail.com" className="btn btn-ghost btn-sm" style={{ padding: '6px' }} title="Email"><Mail size={18}/></a>
-              </div>
+              
+              {/* Dollar sign background pattern matching image */}
+              <div style={{ position: 'absolute', top: '10%', right: '15%', opacity: 0.15, color: 'var(--primary)', fontSize: '20px', fontWeight: 800, transform: 'rotate(15deg)' }}>$</div>
+              <div style={{ position: 'absolute', top: '30%', right: '35%', opacity: 0.12, color: 'var(--primary)', fontSize: '24px', fontWeight: 800, transform: 'rotate(-10deg)' }}>$</div>
+              <div style={{ position: 'absolute', bottom: '25%', right: '10%', opacity: 0.18, color: 'var(--primary)', fontSize: '18px', fontWeight: 800, transform: 'rotate(5deg)' }}>$</div>
+              <div style={{ position: 'absolute', bottom: '15%', right: '45%', opacity: 0.1, color: 'var(--primary)', fontSize: '22px', fontWeight: 800, transform: 'rotate(-15deg)' }}>$</div>
+              <div style={{ position: 'absolute', top: '50%', right: '25%', opacity: 0.14, color: 'var(--primary)', fontSize: '16px', fontWeight: 800, transform: 'rotate(25deg)' }}>$</div>
+              <div style={{ position: 'absolute', top: '20%', left: '40%', opacity: 0.1, color: 'var(--primary)', fontSize: '18px', fontWeight: 800, transform: 'rotate(-5deg)' }}>$</div>
+              <div style={{ position: 'absolute', bottom: '40%', left: '20%', opacity: 0.12, color: 'var(--primary)', fontSize: '20px', fontWeight: 800, transform: 'rotate(12deg)' }}>$</div>
             </div>
 
           </div>
