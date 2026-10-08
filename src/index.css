@@ -199,4 +199,45 @@ input[type="number"] {
 .h-full { height: 100%; }
 .w-full { width: 100%; }
 .opacity-0 { opacity: 0; }
-html.dark { --bg-color: #0F1115; --bg-card: #17181C; --bg-soft: #1E2024; --bg-input: #1A1C20; --border: #2A2D33; --border-focus: #A3E635; --sidebar-bg: #17181C; --text-primary: #FFFFFF; --text-secondary: #9AA0A6; --text-tertiary: #5F6368; --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.4); --shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.6); --shadow-shell: 0 12px 64px rgba(0, 0, 0, 0.8); --nav-hover-bg: #2A2D33; }
+html.dark {
+  --bg-color: #0F1115;
+  --bg-card: #17181C;
+  --bg-soft: #1E2024;
+  --bg-input: #1A1C20;
+  
+  --border: #2A2D33;
+  --border-focus: #A3E635;
+
+  --sidebar-bg: #17181C;
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #9AA0A6;
+  --text-tertiary: #5F6368;
+
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-shell: 0 12px 64px rgba(0, 0, 0, 0.8);
+
+  --nav-hover-bg: #2A2D33;
+  --nav-active-bg: rgba(163, 230, 53, 0.15);
+  --nav-active-text: #A3E635;
+
+  /* Fix for primary colors in dark mode */
+  --primary-deep: #A3E635;
+  --primary-dark: #84CC16;
+
+  /* Fix for status colors in dark mode */
+  --success: #4ADE80;
+  --success-bg: rgba(74, 222, 128, 0.15);
+  --warning: #FBBF24;
+  --warning-bg: rgba(251, 191, 36, 0.15);
+  --warning-text: #FBBF24;
+  --danger: #FB7185;
+  --danger-bg: rgba(251, 113, 133, 0.15);
+  --danger-text: #FB7185;
+  --info: #818CF8;
+  --info-bg: rgba(129, 140, 248, 0.15);
+}
+
+html.dark ::-webkit-scrollbar-thumb { background: #2A2D33; }
+html.dark ::-webkit-scrollbar-thumb:hover { background: #5F6368; }
