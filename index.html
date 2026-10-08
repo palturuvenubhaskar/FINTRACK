@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="description" content="FINTRACK — Modern lending & finance tracker for money lenders" />
+    
+    <!-- PWA Core -->
+    <meta name="theme-color" content="#A3E635" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- Apple PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="FINTRACK" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
+
+    <!-- Splash screens for iOS -->
+    <link rel="apple-touch-startup-image" href="/icons/icon-512.png" />
+
+    <!-- Open Graph (for sharing) -->
+    <meta property="og:title" content="FINTRACK" />
+    <meta property="og:description" content="Modern lending & finance tracker" />
+    <meta property="og:image" content="/icons/icon-512.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Epilogue:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <title>FINTRACK</title>
+  </head>
+  <body>
+    <script>
+      // If opened directly from file explorer (file:// protocol), redirect to the built version
+      // Skip if already in the dist folder to avoid infinite redirect
+      if (window.location.protocol === 'file:' && !window.location.pathname.includes('/dist/')) {
+        window.location.href = './dist/index.html';
+      }
+    </script>
+    <div id="root"></div>
+    <div id="portal-root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
