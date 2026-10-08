@@ -211,8 +211,8 @@ html.dark {
   --sidebar-bg: #17181C;
 
   --text-primary: #FFFFFF;
-  --text-secondary: #9AA0A6;
-  --text-tertiary: #5F6368;
+  --text-secondary: #D1D5DB;
+  --text-tertiary: #9AA0A6;
 
   --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.4);
   --shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.6);
@@ -241,3 +241,10 @@ html.dark {
 
 html.dark ::-webkit-scrollbar-thumb { background: #2A2D33; }
 html.dark ::-webkit-scrollbar-thumb:hover { background: #5F6368; }
+
+html.dark .btn-primary {
+  color: #14532D;
+}
+html.dark .btn-ghost {
+  border-color: var(--border);
+}

@@ -296,6 +296,8 @@
 
 /* ── Hero Lime Card (Signature) ────────────────────────────── */
 .hero-lime-card {
+  --primary-deep: #14532D; /* Force dark text regardless of dark mode */
+  --primary-dark: #1E4620;
   background: var(--primary);
   border: none;
   border-radius: var(--radius-xl);
@@ -762,7 +764,8 @@ tbody.loan-group tr td { border-bottom: none; }
   display: inline-flex;
   gap: 0;
   margin-bottom: var(--space-5);
-  background: #F0F0F0;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
   border-radius: var(--radius-pill);
   padding: 4px;
   overflow-x: auto;
@@ -786,11 +789,11 @@ tbody.loan-group tr td { border-bottom: none; }
 }
 .tab-btn.active {
   background: var(--primary);
-  color: var(--primary-deep);
+  color: #14532D; /* Force dark text on lime background */
   font-weight: 700;
   box-shadow: 0 2px 8px rgba(163, 230, 53, 0.3);
 }
-.tab-btn:hover:not(.active) { background: rgba(0,0,0,0.04); color: var(--text-primary); }
+.tab-btn:hover:not(.active) { background: var(--nav-hover-bg); color: var(--text-primary); }
 
 /* ── PIN Screen ────────────────────────────────────────────── */
 .pin-screen {
