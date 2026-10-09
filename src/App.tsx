@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import './App.css'
 import PinScreen from './components/PinScreen'
-import { lazy, Suspense } from 'react';
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Customers = lazy(() => import('./pages/Customers'));
-const Loans = lazy(() => import('./pages/Loans'));
-const Collections = lazy(() => import('./pages/Collections'));
-const Records = lazy(() => import('./pages/Records'));
-const Tracker = lazy(() => import('./pages/Tracker'));
-const Settings = lazy(() => import('./pages/Settings'));
+import { Suspense } from 'react';
+import Dashboard from './pages/Dashboard';
+import Customers from './pages/Customers';
+import Loans from './pages/Loans';
+import Collections from './pages/Collections';
+import Records from './pages/Records';
+import Tracker from './pages/Tracker';
+import Settings from './pages/Settings';
 import NotFound from './components/NotFound'
 import AppLoader from './components/AppLoader'
 import InstallPrompt from './components/InstallPrompt'

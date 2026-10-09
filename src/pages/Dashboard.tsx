@@ -164,9 +164,19 @@ export default function Dashboard() {
               {showBalance ? <Eye size={20} /> : <EyeOff size={20} />}
             </button>
           </div>
-          <div style={{ fontSize: 'var(--font-hero)', fontWeight: 800, fontFamily: 'var(--font-display)', marginTop: 'var(--space-2)', lineHeight: 1, letterSpacing: '-1px' }}>
-            {showBalance ? formatCurrency(stats.totalPortfolio) : '₹••••••••'}
-          </div>
+          {(() => {
+            const balanceText = showBalance ? formatCurrency(stats.totalPortfolio) : '₹••••••••';
+            let dynamicFontSize = 'var(--font-hero)';
+            if (balanceText.length > 15) dynamicFontSize = '1.75rem';
+            else if (balanceText.length > 12) dynamicFontSize = '2.25rem';
+            else if (balanceText.length > 9) dynamicFontSize = '2.75rem';
+            
+            return (
+              <div style={{ fontSize: dynamicFontSize, fontWeight: 800, fontFamily: 'var(--font-display)', marginTop: 'var(--space-2)', lineHeight: 1, letterSpacing: '-1px' }}>
+                {balanceText}
+              </div>
+            );
+          })()}
           
           <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: 'var(--space-5) 0' }} />
           

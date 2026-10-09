@@ -19,7 +19,7 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait-primary',
         background_color: '#1E1E2E',
-        theme_color: '#10B981',
+        theme_color: '#000000',
         categories: ['finance', 'productivity'],
         icons: [
           { src: '/icons/icon-72.png', sizes: '72x72', type: 'image/png' },
