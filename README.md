@@ -1,6 +1,5 @@
 # FINTRACK — Finance Tracker Web App
 
-![FINTRACK Hero](src/assets/hero.png)
 
 FINTRACK is a Progressive Web Application (PWA) designed for individual money lenders and micro-finance operators. It digitizes the traditional paper-ledger system, allowing lenders to track customers, manage loans, monitor EMI schedules, record collections, and generate business reports. It features offline-first functionality and multi-device synchronization.
 
