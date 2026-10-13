@@ -125,7 +125,15 @@ export default function Tracker() {
     setIsSubmitting(true);
     
     try {
-      const paymentMs = new Date(paymentModal.date).getTime() || Date.now();
+      const now = new Date();
+      const isSelectedToday = !paymentModal.date || paymentModal.date === now.toLocaleDateString('en-CA');
+      let paymentMs = Date.now();
+      if (!isSelectedToday && paymentModal.date) {
+        const [y, m, d] = paymentModal.date.split('-').map(Number);
+        if (y && m && d) {
+          paymentMs = new Date(y, m - 1, d, now.getHours(), now.getMinutes(), now.getSeconds()).getTime();
+        }
+      }
 
       await db.collections.add({
         id: uuid(),

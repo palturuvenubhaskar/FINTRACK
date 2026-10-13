@@ -88,7 +88,7 @@ export default function PinScreen({ mode, onSuccess, onCancel }: PinScreenProps)
     ? 'FINTRACK'
     : 'FINTRACK';
   const subtitle = mode === 'setup'
-    ? (step === 'enter' ? 'Set a 4-digit access code' : 'Confirm your access code')
+    ? (step === 'enter' ? 'Set a 6-digit access code' : 'Confirm your access code')
     : 'Welcome back, Lender';
 
   return (

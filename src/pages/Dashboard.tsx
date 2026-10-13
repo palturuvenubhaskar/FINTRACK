@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { db, formatCurrency, formatCompact, startOfDay, startOfMonth } from '../db';
+import { useState, useEffect, useMemo } from 'react';
+import { db, formatCurrency, formatCompact, startOfDay, startOfMonth, isToday } from '../db';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 // AppContext unused
 import { Eye, EyeOff, Plus, AlertCircle, ArrowRight, Check } from 'lucide-react';
@@ -9,16 +9,36 @@ export default function Dashboard() {
   const [stats, setStats] = useState({
     totalPortfolio: 0, totalRecoverable: 0, pendingRecovery: 0, todayCollection: 0,
     monthCollection: 0, activeLoans: 0, overdueLoans: 0, npaLoans: 0,
-    yesterdayCollection: 0,
+    yesterdayCollection: 0, todayCollectionsCount: 0,
   });
   
   const [recentCollections, setRecentCollections] = useState<any[]>([]);
+  const [activityRange, setActivityRange] = useState<'today' | '7d' | '30d' | 'all'>('all');
   const [overdueLoans, setOverdueLoans] = useState<any[]>([]);
   
   const [chartData, setChartData] = useState<{ date: string; amount: number }[]>([]);
   // Unused chartTotal removed
   const [chartRange, setChartRange] = useState<'week' | 'month' | 'year' | 'all'>('week');
   const [showBalance, setShowBalance] = useState(true);
+
+  const filteredActivity = useMemo(() => {
+    const now = Date.now();
+    const dayMs = 86400000;
+    const todayStart = startOfDay();
+
+    return recentCollections.filter((c) => {
+      if (activityRange === 'today') {
+        return c.date >= todayStart;
+      }
+      if (activityRange === '7d') {
+        return c.date >= now - 7 * dayMs;
+      }
+      if (activityRange === '30d') {
+        return c.date >= now - 30 * dayMs;
+      }
+      return true;
+    });
+  }, [recentCollections, activityRange]);
 
   useEffect(() => {
     loadDashboard();
@@ -92,6 +112,30 @@ export default function Dashboard() {
     const yesterdayEnd = todayStart;
 
     const allCollections = await db.collections.filter(c => !c.deleted).toArray();
+
+    // Repair collections stored as UTC midnight (where hour became 05:30 in IST) using createdAt
+    const collectionsToFix = allCollections.filter(c => {
+      if (!c.createdAt) return false;
+      const d = new Date(c.date);
+      return d.getUTCHours() === 0 && d.getUTCMinutes() === 0 && d.getUTCSeconds() === 0 && d.getUTCMilliseconds() === 0;
+    });
+
+    if (collectionsToFix.length > 0) {
+      for (const c of collectionsToFix) {
+        const createdDateStr = new Date(c.createdAt!).toLocaleDateString('en-CA');
+        const collDateStr = new Date(c.date).toLocaleDateString('en-CA');
+        let newDate = c.createdAt!;
+        if (createdDateStr !== collDateStr) {
+          const cr = new Date(c.createdAt!);
+          const target = new Date(c.date);
+          target.setHours(cr.getHours(), cr.getMinutes(), cr.getSeconds(), cr.getMilliseconds());
+          newDate = target.getTime();
+        }
+        await db.collections.update(c.id, { date: newDate });
+        c.date = newDate;
+      }
+    }
+
     const todayC = allCollections.filter(c => c.date >= todayStart);
     const yesterdayC = allCollections.filter(c => c.date >= yesterdayStart.getTime() && c.date < yesterdayEnd);
     const monthC = allCollections.filter(c => c.date >= monthStart);
@@ -108,13 +152,16 @@ export default function Dashboard() {
       activeLoans: active.length,
       overdueLoans: overdue.length,
       npaLoans: npa.length,
+      todayCollectionsCount: todayC.length,
     });
 
-    const recent = allCollections.sort((a, b) => b.date - a.date).slice(0, 5);
-    const withNames = await Promise.all(recent.map(async (c) => {
-      const cust = await db.customers.get(c.customerId);
-      return { ...c, customerName: cust?.name || 'Unknown', customerInitials: getInitials(cust?.name || 'U') };
-    }));
+    const sortedCollections = allCollections.sort((a, b) => b.date - a.date);
+    const customers = await db.customers.toArray();
+    const custMap = new Map(customers.map(c => [c.id, c.name]));
+    const withNames = sortedCollections.map((c) => {
+      const name = custMap.get(c.customerId) || 'Unknown';
+      return { ...c, customerName: name, customerInitials: getInitials(name) };
+    });
     setRecentCollections(withNames);
     
     const overdueSorted = overdue.sort((a, b) => {
@@ -328,7 +375,7 @@ export default function Dashboard() {
             <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--primary-dark)', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span>Due: {stats.activeLoans}</span>
               <span style={{ opacity: 0.5 }}>|</span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '2px' }}><Check size={14} strokeWidth={4} /> {recentCollections.length}</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '2px' }}><Check size={14} strokeWidth={4} /> {stats.todayCollectionsCount}</span>
             </span>
           </div>
         </div>
@@ -380,18 +427,32 @@ export default function Dashboard() {
 
         {/* RECENT ACTIVITY */}
         <div className="card" style={{ padding: 'var(--space-4)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', gap: 'var(--space-2)' }}>
             <span style={{ fontSize: 'var(--font-sm)', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-secondary)' }}>Recent Activity</span>
+            
+            <div className="sort-minimal-container" style={{ minHeight: '28px', height: '28px', padding: '0 8px', borderRadius: 'var(--radius-sm)' }}>
+              <select 
+                className="sort-minimal" 
+                value={activityRange} 
+                onChange={(e) => setActivityRange(e.target.value as any)}
+                style={{ fontSize: '12px', paddingRight: '16px', backgroundPosition: 'right 2px center' }}
+              >
+                <option value="today" style={{ background: 'var(--bg-card)', color: 'var(--text-primary)' }}>Today</option>
+                <option value="7d" style={{ background: 'var(--bg-card)', color: 'var(--text-primary)' }}>Last 7 Days</option>
+                <option value="30d" style={{ background: 'var(--bg-card)', color: 'var(--text-primary)' }}>Last 30 Days</option>
+                <option value="all" style={{ background: 'var(--bg-card)', color: 'var(--text-primary)' }}>All</option>
+              </select>
+            </div>
           </div>
           
-          {recentCollections.length === 0 ? (
+          {filteredActivity.length === 0 ? (
             <div style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 'var(--font-sm)', fontWeight: 500 }}>
-              No activity yet.
+              No activity in this period.
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-              {recentCollections.map((c, i) => (
-                <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', paddingBottom: i < recentCollections.length - 1 ? 'var(--space-3)' : 0, borderBottom: i < recentCollections.length - 1 ? '1px solid var(--border)' : 'none' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', maxHeight: '380px', overflowY: 'auto', paddingRight: '2px' }}>
+              {filteredActivity.map((c, i) => (
+                <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', paddingBottom: i < filteredActivity.length - 1 ? 'var(--space-3)' : 0, borderBottom: i < filteredActivity.length - 1 ? '1px solid var(--border)' : 'none' }}>
                   <div style={{ width: 36, height: 36, borderRadius: 8, background: 'var(--bg-soft)', color: 'var(--text-secondary)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '11px', fontWeight: 800 }}>
                     {c.customerInitials}
                   </div>
@@ -400,12 +461,18 @@ export default function Dashboard() {
                       {c.customerName}
                     </div>
                     <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                      {new Date(c.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      {(() => {
+                        const d = new Date(c.date);
+                        const timeMs = (c.createdAt && d.getUTCHours() === 0 && d.getUTCMinutes() === 0) ? c.createdAt : c.date;
+                        return isToday(timeMs)
+                          ? new Date(timeMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                          : `${new Date(timeMs).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}, ${new Date(timeMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                      })()}
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontWeight: 800, fontSize: 'var(--font-sm)', color: 'var(--success)' }}>
-                      +{formatCompact(c.amount)}
+                      +{formatCurrency(c.amount, c.amount % 1 === 0 ? 0 : 2)}
                     </div>
                     <div style={{ fontSize: '10px', color: 'var(--text-secondary)', fontWeight: 700, textTransform: 'uppercase', marginTop: 2 }}>
                       {c.mode || 'Cash'}
@@ -413,13 +480,6 @@ export default function Dashboard() {
                   </div>
                 </div>
               ))}
-              <button 
-                className="btn btn-ghost btn-sm" 
-                style={{ width: '100%', justifyContent: 'center', border: 'none', color: 'var(--primary-deep)', marginTop: 'var(--space-2)' }}
-                onClick={() => document.dispatchEvent(new CustomEvent('ft-navigate', { detail: 'records' }))}
-              >
-                View all activity <ArrowRight size={14} />
-              </button>
             </div>
           )}
         </div>

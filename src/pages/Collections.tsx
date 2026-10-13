@@ -106,7 +106,15 @@ export default function Collections() {
 
     try {
       const collId = uuid();
-      const paymentMs = new Date(collectForm.date).getTime() || Date.now();
+      const now = new Date();
+      const isSelectedToday = !collectForm.date || collectForm.date === now.toLocaleDateString('en-CA');
+      let paymentMs = Date.now();
+      if (!isSelectedToday && collectForm.date) {
+        const [y, m, d] = collectForm.date.split('-').map(Number);
+        if (y && m && d) {
+          paymentMs = new Date(y, m - 1, d, now.getHours(), now.getMinutes(), now.getSeconds()).getTime();
+        }
+      }
 
       await db.collections.add({
         id: collId, loanId: loan.id, customerId: loan.customerId,
