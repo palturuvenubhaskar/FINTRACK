@@ -16,8 +16,8 @@ export default function CustomerProfile({ customer, stats, onClose, onEdit }: Cu
     ? Math.min(100, Math.max(0, Math.round((stats.totalPaid / (stats.totalPaid + stats.outstanding)) * 100))) 
     : 100;
   
-  const scoreColor = score >= 80 ? '#22c55e' : score >= 50 ? '#f59e0b' : '#ef4444';
-  const scoreBg = score >= 80 ? '#dcfce7' : score >= 50 ? '#fef3c7' : '#fee2e2';
+  const scoreColor = score >= 80 ? 'var(--success)' : score >= 50 ? 'var(--warning)' : 'var(--danger)';
+  const scoreBg = score >= 80 ? 'var(--success-bg)' : score >= 50 ? 'var(--warning-bg)' : 'var(--danger-bg)';
   const scoreLabel = score >= 80 ? 'Excellent' : score >= 50 ? 'Average' : 'At Risk';
 
   const radius = 30;
@@ -148,7 +148,7 @@ export default function CustomerProfile({ customer, stats, onClose, onEdit }: Cu
           <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px' }}>
             <div style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
               <svg width="72" height="72" viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)' }}>
-                <circle cx="36" cy="36" r={radius} fill="none" stroke="#e5e7eb" strokeWidth="5" />
+                <circle cx="36" cy="36" r={radius} fill="none" stroke="var(--border)" strokeWidth="5" />
                 <circle 
                   cx="36" cy="36" r={radius} fill="none" 
                   stroke={scoreColor} strokeWidth="5" strokeLinecap="round"
@@ -188,11 +188,11 @@ export default function CustomerProfile({ customer, stats, onClose, onEdit }: Cu
                   background: 'var(--bg-soft)', borderRadius: 8, textDecoration: 'none',
                   transition: 'background 0.2s',
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#ecfccb')}
+                onMouseEnter={e => (e.currentTarget.style.background = 'var(--primary-alpha)')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'var(--bg-soft)')}
                 >
-                  <div style={{ width: 28, height: 28, borderRadius: 7, background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Phone size={12} style={{ color: '#22c55e' }} />
+                  <div style={{ width: 28, height: 28, borderRadius: 7, background: 'var(--success-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Phone size={12} style={{ color: 'var(--success)' }} />
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>{p}</div>
@@ -207,8 +207,8 @@ export default function CustomerProfile({ customer, stats, onClose, onEdit }: Cu
                   display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px',
                   background: 'var(--bg-soft)', borderRadius: 8,
                 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 7, background: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <MapPin size={12} style={{ color: '#3b82f6' }} />
+                  <div style={{ width: 28, height: 28, borderRadius: 7, background: 'var(--info-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <MapPin size={12} style={{ color: 'var(--info)' }} />
                   </div>
                   <div>
                     <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>{addr}</div>
@@ -219,8 +219,8 @@ export default function CustomerProfile({ customer, stats, onClose, onEdit }: Cu
 
               {customer.aadhaar && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', background: 'var(--bg-soft)', borderRadius: 8 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 7, background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <CreditCard size={12} style={{ color: '#f59e0b' }} />
+                  <div style={{ width: 28, height: 28, borderRadius: 7, background: 'var(--warning-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <CreditCard size={12} style={{ color: 'var(--warning)' }} />
                   </div>
                   <div>
                     <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>{customer.aadhaar.replace(/(\d{4})/g, '$1 ').trim()}</div>
@@ -231,8 +231,8 @@ export default function CustomerProfile({ customer, stats, onClose, onEdit }: Cu
 
               {customer.pan && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', background: 'var(--bg-soft)', borderRadius: 8 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 7, background: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <CreditCard size={12} style={{ color: '#6366f1' }} />
+                  <div style={{ width: 28, height: 28, borderRadius: 7, background: 'var(--info-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <CreditCard size={12} style={{ color: 'var(--info)' }} />
                   </div>
                   <div>
                     <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>{customer.pan}</div>
@@ -252,24 +252,24 @@ export default function CustomerProfile({ customer, stats, onClose, onEdit }: Cu
             <div style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 12 }}>Financial Overview</div>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
-              <div style={{ background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', padding: '10px 12px', borderRadius: 10, border: '1px solid #bbf7d0' }}>
-                <div style={{ fontSize: '10px', fontWeight: 700, color: '#166534', textTransform: 'uppercase', marginBottom: 4 }}>Total Principal</div>
-                <div style={{ fontSize: 'clamp(15px, 2.5vw, 20px)', fontWeight: 800, color: '#15803d', fontFamily: 'var(--font-display)', letterSpacing: '-0.3px', wordBreak: 'break-word' }}>{formatCurrency(stats.given)}</div>
+              <div style={{ background: 'var(--success-bg)', padding: '10px 12px', borderRadius: 10, border: '1px solid var(--border)' }}>
+                <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--success)', textTransform: 'uppercase', marginBottom: 4 }}>Total Principal</div>
+                <div style={{ fontSize: 'clamp(15px, 2.5vw, 20px)', fontWeight: 800, color: 'var(--success)', fontFamily: 'var(--font-display)', letterSpacing: '-0.3px', wordBreak: 'break-word' }}>{formatCurrency(stats.given)}</div>
               </div>
-              <div style={{ background: 'linear-gradient(135deg, #fef2f2, #fee2e2)', padding: '10px 12px', borderRadius: 10, border: '1px solid #fecaca' }}>
-                <div style={{ fontSize: '10px', fontWeight: 700, color: '#991b1b', textTransform: 'uppercase', marginBottom: 4 }}>Outstanding</div>
-                <div style={{ fontSize: 'clamp(15px, 2.5vw, 20px)', fontWeight: 800, color: '#dc2626', fontFamily: 'var(--font-display)', letterSpacing: '-0.3px', wordBreak: 'break-word' }}>{formatCurrency(stats.outstanding)}</div>
+              <div style={{ background: 'var(--danger-bg)', padding: '10px 12px', borderRadius: 10, border: '1px solid var(--border)' }}>
+                <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--danger)', textTransform: 'uppercase', marginBottom: 4 }}>Outstanding</div>
+                <div style={{ fontSize: 'clamp(15px, 2.5vw, 20px)', fontWeight: 800, color: 'var(--danger)', fontFamily: 'var(--font-display)', letterSpacing: '-0.3px', wordBreak: 'break-word' }}>{formatCurrency(stats.outstanding)}</div>
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
               <div style={{ padding: '8px 0', borderTop: '2px solid var(--border)' }}>
                 <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: 3 }}>Expected</div>
-                <div style={{ fontSize: '15px', fontWeight: 800, color: '#f59e0b', fontFamily: 'var(--font-display)' }}>{formatCurrency(stats.totalPaid + stats.outstanding)}</div>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--warning-text)', fontFamily: 'var(--font-display)' }}>{formatCurrency(stats.totalPaid + stats.outstanding)}</div>
               </div>
               <div style={{ padding: '8px 0', borderTop: '2px solid var(--border)' }}>
                 <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: 3 }}>Recovered</div>
-                <div style={{ fontSize: '15px', fontWeight: 800, color: '#22c55e', fontFamily: 'var(--font-display)' }}>{formatCurrency(stats.totalPaid)}</div>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--success)', fontFamily: 'var(--font-display)' }}>{formatCurrency(stats.totalPaid)}</div>
               </div>
             </div>
 
@@ -279,12 +279,12 @@ export default function CustomerProfile({ customer, stats, onClose, onEdit }: Cu
                 <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>Recovery Rate</span>
                 <span style={{ fontSize: '13px', fontWeight: 800, color: scoreColor }}>{score}%</span>
               </div>
-              <div style={{ width: '100%', height: 7, background: '#e5e7eb', borderRadius: 4, overflow: 'hidden' }}>
+              <div style={{ width: '100%', height: 7, background: 'var(--border)', borderRadius: 4, overflow: 'hidden' }}>
                 <div style={{ 
                   height: '100%', borderRadius: 4,
-                  background: `linear-gradient(90deg, ${scoreColor}, ${score >= 80 ? '#4ade80' : score >= 50 ? '#fbbf24' : '#f87171'})`,
+                  background: `linear-gradient(90deg, ${scoreColor}, ${score >= 80 ? 'var(--success)' : score >= 50 ? 'var(--warning)' : 'var(--danger)'})`,
                   width: `${score}%`, transition: 'width 1s ease-out',
-                  boxShadow: `0 0 8px ${scoreColor}40`,
+                  boxShadow: `0 0 8px ${scoreColor}`,
                 }} />
               </div>
             </div>
@@ -295,9 +295,9 @@ export default function CustomerProfile({ customer, stats, onClose, onEdit }: Cu
             <div style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 10 }}>Loan Breakdown</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
               {[
-                { label: 'Total', value: stats.totalLoans, color: '#1e293b', bg: '#f1f5f9', borderColor: '#e2e8f0' },
-                { label: 'Running', value: stats.activeLoans + stats.overdueLoans, color: '#15803d', bg: '#f0fdf4', borderColor: '#bbf7d0' },
-                { label: 'Closed', value: stats.closedLoans, color: '#6b7280', bg: '#f9fafb', borderColor: '#e5e7eb' },
+                { label: 'Total', value: stats.totalLoans, color: 'var(--text-primary)', bg: 'var(--bg-soft)', borderColor: 'var(--border)' },
+                { label: 'Running', value: stats.activeLoans + stats.overdueLoans, color: 'var(--success)', bg: 'var(--success-bg)', borderColor: 'var(--border)' },
+                { label: 'Closed', value: stats.closedLoans, color: 'var(--text-tertiary)', bg: 'var(--bg-soft)', borderColor: 'var(--border)' },
               ].map((item, i) => (
                 <div key={i} style={{ 
                   background: item.bg, borderRadius: 10, padding: '10px 8px', 
@@ -318,9 +318,9 @@ export default function CustomerProfile({ customer, stats, onClose, onEdit }: Cu
             {stats.overdueLoans > 0 && (
               <div style={{ 
                 marginTop: 10, padding: '8px 10px', borderRadius: 8,
-                background: '#fef2f2', border: '1px solid #fecaca', 
+                background: 'var(--danger-bg)', border: '1px solid var(--danger)', 
                 display: 'flex', alignItems: 'center', gap: 6,
-                fontSize: '11px', fontWeight: 700, color: '#dc2626',
+                fontSize: '11px', fontWeight: 700, color: 'var(--danger)',
               }}>
                 <Activity size={13} />
                 {stats.overdueLoans} loan{stats.overdueLoans > 1 ? 's' : ''} overdue

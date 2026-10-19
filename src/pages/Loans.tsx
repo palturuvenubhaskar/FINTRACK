@@ -60,7 +60,8 @@ export default function Loans() {
     const customerMap = Object.fromEntries(allCustomers.map(c => [c.id, c.name]));
     const occupationMap = Object.fromEntries(allCustomers.map(c => [c.id, c.occupation]));
     const placeMap = Object.fromEntries(allCustomers.map(c => [c.id, c.place]));
-    const withNames = allLoans.map(l => ({ ...l, customerName: customerMap[l.customerId] || 'Unknown', customerOccupation: occupationMap[l.customerId], customerPlace: placeMap[l.customerId] }));
+    const addressMap = Object.fromEntries(allCustomers.map(c => [c.id, c.addresses?.filter(Boolean)?.[0] || c.address || '']));
+    const withNames = allLoans.map(l => ({ ...l, customerName: customerMap[l.customerId] || 'Unknown', customerOccupation: occupationMap[l.customerId], customerPlace: placeMap[l.customerId], customerAddress: addressMap[l.customerId] }));
     setLoans(withNames.sort((a, b) => b.createdAt - a.createdAt));
     setCustomers(allCustomers);
     
@@ -444,8 +445,11 @@ export default function Loans() {
               padding: '20px',
               boxShadow: '0 8px 24px rgba(0,0,0,0.03)',
               display: 'flex', flexDirection: 'column', gap: '16px',
-              overflow: 'hidden'
-            }}>
+              overflow: 'hidden',
+              cursor: 'pointer'
+            }}
+            onClick={() => navigateToCustomer(l.customerId)}
+            >
               {(l.status === 'overdue' || l.status === 'npa') && (
                 <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: l.status === 'overdue' ? 'var(--danger)' : '#7f1d1d' }} />
               )}
@@ -471,6 +475,25 @@ export default function Loans() {
                       <span>{l.tenure} {l.type === 'daily' ? 'days' : l.type === 'weekly' ? 'weeks' : 'months'}</span>
                       {l.status === 'closed' && l.closedAt && <><span style={{ color: 'var(--border-focus)', opacity: 0.3 }}>•</span><span style={{ color: 'var(--success)' }}>Closed: {formatDate(l.closedAt)}</span></>}
                     </div>
+                    {(l.customerOccupation || l.customerAddress || l.customerPlace) && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--text-tertiary)', fontWeight: 600, marginTop: '2px' }}>
+                        {l.customerOccupation && (
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                            {l.customerOccupation}
+                          </span>
+                        )}
+                        {l.customerOccupation && (l.customerAddress || l.customerPlace) && (
+                          <span style={{ color: 'var(--border-focus)', opacity: 0.3 }}>•</span>
+                        )}
+                        {(l.customerAddress || l.customerPlace) && (
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '200px' }}>
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            {l.customerAddress || l.customerPlace}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -481,7 +504,9 @@ export default function Loans() {
                     </svg>
                   </button>
                   {activeMenuId === l.id && (
-                    <div style={{ position: 'absolute', right: 0, top: isLastRows ? 'auto' : '100%', bottom: isLastRows ? '100%' : 'auto', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: '0 12px 32px rgba(0,0,0,0.12)', zIndex: 100, minWidth: '150px', padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
+                    <div 
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ position: 'absolute', right: 0, top: isLastRows ? 'auto' : '100%', bottom: isLastRows ? '100%' : 'auto', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: '0 12px 32px rgba(0,0,0,0.12)', zIndex: 100, minWidth: '150px', padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
                       <button className="menu-btn" onClick={() => handleEditClick(l)}>Edit Loan</button>
                       {l.status !== 'npa' && l.status !== 'closed' && (
                         <button className="menu-btn" onClick={() => { handleMarkNpa(l.id); setActiveMenuId(null); }}>Mark NPA</button>
@@ -567,8 +592,9 @@ export default function Loans() {
                   background: 'var(--bg-card)', 
                   boxShadow: 'var(--shadow-card)',
                   transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                  cursor: 'default'
+                  cursor: 'pointer'
                 }}
+                onClick={() => navigateToCustomer(l.customerId)}
                 onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-card-hover)'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'var(--shadow-card)'; }}
                 >
@@ -639,7 +665,9 @@ export default function Loans() {
                       </svg>
                     </button>
                     {activeMenuId === l.id && (
-                      <div style={{ position: 'absolute', right: '50%', top: isLastRows ? 'auto' : '50%', bottom: isLastRows ? '50%' : 'auto', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-shell)', zIndex: 100, minWidth: '140px', padding: 'var(--space-2)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div 
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ position: 'absolute', right: '50%', top: isLastRows ? 'auto' : '50%', bottom: isLastRows ? '50%' : 'auto', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-shell)', zIndex: 100, minWidth: '140px', padding: 'var(--space-2)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <button style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'left', background: 'transparent', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', fontSize: 'var(--font-sm)', fontWeight: 600, borderRadius: 'var(--radius-sm)', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-soft)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'} onClick={() => handleEditClick(l)}>Edit Loan</button>
                         {l.status !== 'npa' && l.status !== 'closed' && (
                           <button style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'left', background: 'transparent', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', fontSize: 'var(--font-sm)', fontWeight: 600, borderRadius: 'var(--radius-sm)', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-soft)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'} onClick={() => { handleMarkNpa(l.id); setActiveMenuId(null); }}>Mark NPA</button>

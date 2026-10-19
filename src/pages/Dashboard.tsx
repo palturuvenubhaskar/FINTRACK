@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { db, formatCurrency, formatCompact, startOfDay, startOfMonth, isToday } from '../db';
+import { db, formatCurrency, formatCompact, startOfDay, startOfMonth } from '../db';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 // AppContext unused
 import { Eye, EyeOff, Plus, AlertCircle, ArrowRight, Check } from 'lucide-react';
@@ -13,7 +13,7 @@ export default function Dashboard() {
   });
   
   const [recentCollections, setRecentCollections] = useState<any[]>([]);
-  const [activityRange, setActivityRange] = useState<'today' | '7d' | '30d' | 'all'>('all');
+  const [activityRange, setActivityRange] = useState<'today' | '7d' | '30d' | 'all'>('today');
   const [overdueLoans, setOverdueLoans] = useState<any[]>([]);
   
   const [chartData, setChartData] = useState<{ date: string; amount: number }[]>([]);
@@ -39,6 +39,38 @@ export default function Dashboard() {
       return true;
     });
   }, [recentCollections, activityRange]);
+
+  const groupedActivity = useMemo(() => {
+    const groups: { dateLabel: string; dateKey: string; items: typeof filteredActivity }[] = [];
+    const map = new Map<string, typeof filteredActivity>();
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const todayStr = today.toLocaleDateString('en-CA');
+    const yesterdayStr = yesterday.toLocaleDateString('en-CA');
+
+    for (const c of filteredActivity) {
+      const d = new Date(c.date);
+      const key = d.toLocaleDateString('en-CA'); // YYYY-MM-DD for grouping
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(c);
+    }
+
+    for (const [key, items] of map) {
+      let dateLabel: string;
+      if (key === todayStr) {
+        dateLabel = 'Today';
+      } else if (key === yesterdayStr) {
+        dateLabel = 'Yesterday';
+      } else {
+        const d = new Date(key + 'T00:00:00');
+        dateLabel = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+      }
+      groups.push({ dateLabel, dateKey: key, items });
+    }
+
+    return groups;
+  }, [filteredActivity]);
 
   useEffect(() => {
     loadDashboard();
@@ -450,33 +482,58 @@ export default function Dashboard() {
               No activity in this period.
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', maxHeight: '380px', overflowY: 'auto', paddingRight: '2px' }}>
-              {filteredActivity.map((c, i) => (
-                <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', paddingBottom: i < filteredActivity.length - 1 ? 'var(--space-3)' : 0, borderBottom: i < filteredActivity.length - 1 ? '1px solid var(--border)' : 'none' }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 8, background: 'var(--bg-soft)', color: 'var(--text-secondary)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '11px', fontWeight: 800 }}>
-                    {c.customerInitials}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, maxHeight: '380px', overflowY: 'auto', paddingRight: '2px' }}>
+              {groupedActivity.map((group, gi) => (
+                <div key={group.dateKey}>
+                  {/* Date header */}
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: 'var(--space-2) 0',
+                    marginTop: gi > 0 ? 'var(--space-3)' : 0,
+                    marginBottom: 'var(--space-2)',
+                    borderBottom: '1px solid var(--border)',
+                  }}>
+                    <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-tertiary)' }}>
+                      {group.dateLabel}
+                    </span>
+                    <span style={{
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      color: 'var(--primary-deep)',
+                      background: 'var(--primary-alpha)',
+                      padding: '2px 8px',
+                      borderRadius: '100px',
+                    }}>
+                      {group.items.length} {group.items.length === 1 ? 'entry' : 'entries'}
+                    </span>
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, fontSize: 'var(--font-sm)', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {c.customerName}
-                    </div>
-                    <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                      {(() => {
-                        const d = new Date(c.date);
-                        const timeMs = (c.createdAt && d.getUTCHours() === 0 && d.getUTCMinutes() === 0) ? c.createdAt : c.date;
-                        return isToday(timeMs)
-                          ? new Date(timeMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                          : `${new Date(timeMs).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}, ${new Date(timeMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-                      })()}
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontWeight: 800, fontSize: 'var(--font-sm)', color: 'var(--success)' }}>
-                      +{formatCurrency(c.amount, c.amount % 1 === 0 ? 0 : 2)}
-                    </div>
-                    <div style={{ fontSize: '10px', color: 'var(--text-secondary)', fontWeight: 700, textTransform: 'uppercase', marginTop: 2 }}>
-                      {c.mode || 'Cash'}
-                    </div>
+                  {/* Activity items */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                    {group.items.map((c, i) => (
+                      <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', paddingBottom: i < group.items.length - 1 ? 'var(--space-3)' : 0, borderBottom: i < group.items.length - 1 ? '1px solid var(--border)' : 'none' }}>
+                        <div style={{ width: 36, height: 36, borderRadius: 8, background: 'var(--bg-soft)', color: 'var(--text-secondary)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '11px', fontWeight: 800 }}>
+                          {c.customerInitials}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: 700, fontSize: 'var(--font-sm)', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {c.customerName}
+                          </div>
+                          <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                            {new Date(c.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontWeight: 800, fontSize: 'var(--font-sm)', color: 'var(--success)' }}>
+                            +{formatCurrency(c.amount, c.amount % 1 === 0 ? 0 : 2)}
+                          </div>
+                          <div style={{ fontSize: '10px', color: 'var(--text-secondary)', fontWeight: 700, textTransform: 'uppercase', marginTop: 2 }}>
+                            {c.mode || 'Cash'}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}

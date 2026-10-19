@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { db, type Customer, formatCurrency, getNextCustomerDisplayId } from '../db';
 import { v4 as uuid } from 'uuid';
 import { handleEnterToNext } from '../utils/keyboard';
@@ -12,7 +12,7 @@ interface CustomersProps {
   clearTarget?: () => void;
 }
 
-export default function Customers(_props: CustomersProps) {
+export default function Customers({ targetId, clearTarget }: CustomersProps) {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [search, setSearch] = useState('');
   const [sortParam, setSortParam] = useState<'default' | 'name-asc' | 'name-desc' | 'outstanding-desc' | 'recent'>('default');
@@ -27,7 +27,27 @@ export default function Customers(_props: CustomersProps) {
   const [stats, setStats] = useState<Record<string, { given: number, outstanding: number, totalPaid: number, totalLoans: number, activeLoans: number, overdueLoans: number, closedLoans: number, hasNpa: boolean, nextDueDate: number | null, lastClosedAt: number | null }>>({});
   const [isLoading, setIsLoading] = useState(true);
 
+  const prevTargetIdRef = useRef<string | null | undefined>(targetId);
+
   useEffect(() => { loadCustomers(); }, []);
+
+  useEffect(() => {
+    if (targetId) {
+      const found = customers.find(c => c.id === targetId);
+      if (found) {
+        setSelectedProfileCustomer(found);
+      } else {
+        db.customers.get(targetId).then(cust => {
+          if (cust) {
+            setSelectedProfileCustomer(cust);
+          }
+        });
+      }
+    } else if (prevTargetIdRef.current && !targetId) {
+      setSelectedProfileCustomer(null);
+    }
+    prevTargetIdRef.current = targetId;
+  }, [targetId, customers]);
 
   async function loadCustomers() {
     setIsLoading(true);
@@ -206,15 +226,19 @@ export default function Customers(_props: CustomersProps) {
   }
 
   if (selectedProfileCustomer) {
-    const st = stats[selectedProfileCustomer.id] || { given: 0, outstanding: 0, totalPaid: 0, totalLoans: 0, activeLoans: 0, overdueLoans: 0, closedLoans: 0, hasNpa: false, nextDueDate: null };
+    const st = stats[selectedProfileCustomer.id] || { given: 0, outstanding: 0, totalPaid: 0, totalLoans: 0, activeLoans: 0, overdueLoans: 0, closedLoans: 0, hasNpa: false, nextDueDate: null, lastClosedAt: null };
     return (
       <CustomerProfile
         customer={selectedProfileCustomer}
         stats={st}
-        onClose={() => setSelectedProfileCustomer(null)}
+        onClose={() => {
+          setSelectedProfileCustomer(null);
+          clearTarget?.();
+        }}
         onEdit={() => {
           const customerToEdit = selectedProfileCustomer;
           setSelectedProfileCustomer(null);
+          clearTarget?.();
           openEdit(customerToEdit);
         }}
       />

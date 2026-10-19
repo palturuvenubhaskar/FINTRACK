@@ -223,7 +223,10 @@ function App() {
 
   useEffect(() => {
     const handleNav = (e: any) => {
-      if (e.detail) setPage(e.detail as Page);
+      if (e.detail) {
+        setTargetCustomerId(null);
+        setPage(e.detail as Page);
+      }
     };
     document.addEventListener('ft-navigate', handleNav);
     return () => document.removeEventListener('ft-navigate', handleNav);
@@ -292,7 +295,7 @@ function App() {
                 <button
                   key={item.id}
                   className={`nav-item ${page === item.id ? 'active' : ''}`}
-                  onClick={() => setPage(item.id)}
+                  onClick={() => { setTargetCustomerId(null); setPage(item.id); }}
                 >
                   {item.icon}
                   {item.label}
@@ -333,7 +336,7 @@ function App() {
             <button
               key={item.id}
               className={page === item.id ? 'active' : ''}
-              onClick={() => setPage(item.id)}
+              onClick={() => { setTargetCustomerId(null); setPage(item.id); }}
             >
               <div className="icon-wrap">{item.icon}</div>
               <span className="nav-label">{item.label}</span>
