@@ -39,6 +39,9 @@ export interface Loan extends Syncable {
   displayId?: string;
   customerId: string;
   customerName?: string; // joined field
+  customerOccupation?: string;
+  customerPlace?: string;
+  customerAddress?: string;
   amount: number;
   rate: number;
   type: CollectionType;
