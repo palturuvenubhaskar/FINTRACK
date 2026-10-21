@@ -41,7 +41,13 @@ export default function Dashboard() {
   }, [recentCollections, activityRange]);
 
   const groupedActivity = useMemo(() => {
-    const groups: { dateLabel: string; dateKey: string; items: typeof filteredActivity }[] = [];
+    const groups: { 
+      dateLabel: string; 
+      dayOfWeek: string;
+      dateKey: string; 
+      totalAmount: number;
+      items: typeof filteredActivity 
+    }[] = [];
     const map = new Map<string, typeof filteredActivity>();
     const today = new Date();
     const yesterday = new Date();
@@ -57,16 +63,19 @@ export default function Dashboard() {
     }
 
     for (const [key, items] of map) {
+      const refDate = items[0]?.date ? new Date(items[0].date) : new Date(key + 'T00:00:00');
+      const dayOfWeek = refDate.toLocaleDateString('en-US', { weekday: 'short' });
       let dateLabel: string;
       if (key === todayStr) {
-        dateLabel = 'Today';
+        dateLabel = `Today, ${dayOfWeek}`;
       } else if (key === yesterdayStr) {
-        dateLabel = 'Yesterday';
+        dateLabel = `Yesterday, ${dayOfWeek}`;
       } else {
-        const d = new Date(key + 'T00:00:00');
-        dateLabel = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+        const formattedDate = refDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+        dateLabel = `${formattedDate}, ${dayOfWeek}`;
       }
-      groups.push({ dateLabel, dateKey: key, items });
+      const totalAmount = items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+      groups.push({ dateLabel, dayOfWeek, dateKey: key, totalAmount, items });
     }
 
     return groups;
@@ -189,10 +198,19 @@ export default function Dashboard() {
 
     const sortedCollections = allCollections.sort((a, b) => b.date - a.date);
     const customers = await db.customers.toArray();
-    const custMap = new Map(customers.map(c => [c.id, c.name]));
+    const custMap = new Map(customers.map(c => [c.id, c]));
+    const loanMap = new Map(loans.map(l => [l.id, l]));
     const withNames = sortedCollections.map((c) => {
-      const name = custMap.get(c.customerId) || 'Unknown';
-      return { ...c, customerName: name, customerInitials: getInitials(name) };
+      const cust = custMap.get(c.customerId);
+      const loan = loanMap.get(c.loanId);
+      const name = cust?.name || loan?.customerName || 'Unknown';
+      const occupation = cust?.occupation || loan?.customerOccupation || '';
+      return { 
+        ...c, 
+        customerName: name, 
+        customerOccupation: occupation,
+        customerInitials: getInitials(name) 
+      };
     });
     setRecentCollections(withNames);
     
@@ -458,8 +476,8 @@ export default function Dashboard() {
         </div>
 
         {/* RECENT ACTIVITY */}
-        <div className="card" style={{ padding: 'var(--space-4)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', gap: 'var(--space-2)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-2)', padding: '0 2px' }}>
             <span style={{ fontSize: 'var(--font-sm)', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-secondary)' }}>Recent Activity</span>
             
             <div className="sort-minimal-container" style={{ minHeight: '28px', height: '28px', padding: '0 8px', borderRadius: 'var(--radius-sm)' }}>
@@ -478,36 +496,47 @@ export default function Dashboard() {
           </div>
           
           {filteredActivity.length === 0 ? (
-            <div style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 'var(--font-sm)', fontWeight: 500 }}>
+            <div className="card" style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 'var(--font-sm)', fontWeight: 500 }}>
               No activity in this period.
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, maxHeight: '380px', overflowY: 'auto', paddingRight: '2px' }}>
-              {groupedActivity.map((group, gi) => (
-                <div key={group.dateKey}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', maxHeight: '440px', overflowY: 'auto', paddingRight: '2px' }}>
+              {groupedActivity.map((group) => (
+                <div key={group.dateKey} className="card" style={{ padding: 'var(--space-4)' }}>
                   {/* Date header */}
                   <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    padding: 'var(--space-2) 0',
-                    marginTop: gi > 0 ? 'var(--space-3)' : 0,
-                    marginBottom: 'var(--space-2)',
+                    paddingBottom: 'var(--space-2)',
+                    marginBottom: 'var(--space-3)',
                     borderBottom: '1px solid var(--border)',
+                    gap: 'var(--space-2)',
                   }}>
                     <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-tertiary)' }}>
                       {group.dateLabel}
                     </span>
-                    <span style={{
-                      fontSize: '10px',
-                      fontWeight: 700,
-                      color: 'var(--primary-deep)',
-                      background: 'var(--primary-alpha)',
-                      padding: '2px 8px',
-                      borderRadius: '100px',
-                    }}>
-                      {group.items.length} {group.items.length === 1 ? 'entry' : 'entries'}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0 }}>
+                      <span style={{
+                        fontSize: '10px',
+                        fontWeight: 700,
+                        color: 'var(--primary-deep)',
+                        background: 'var(--primary-alpha)',
+                        padding: '2px 8px',
+                        borderRadius: '100px',
+                        whiteSpace: 'nowrap',
+                      }}>
+                        {group.items.length} {group.items.length === 1 ? 'entry' : 'entries'}
+                      </span>
+                      <span style={{
+                        fontSize: '13px',
+                        fontWeight: 800,
+                        color: 'var(--text-primary)',
+                        letterSpacing: '-0.2px',
+                      }}>
+                        {formatCurrency(group.totalAmount, group.totalAmount % 1 === 0 ? 0 : 2)}
+                      </span>
+                    </div>
                   </div>
                   {/* Activity items */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
@@ -520,7 +549,12 @@ export default function Dashboard() {
                           <div style={{ fontWeight: 700, fontSize: 'var(--font-sm)', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {c.customerName}
                           </div>
-                          <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                          {c.customerOccupation ? (
+                            <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'capitalize', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 1 }}>
+                              {c.customerOccupation}
+                            </div>
+                          ) : null}
+                          <div style={{ fontSize: '10px', fontWeight: 500, color: 'var(--text-tertiary)', marginTop: 1 }}>
                             {new Date(c.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </div>
                         </div>
